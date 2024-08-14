@@ -38,7 +38,6 @@ export default function Home() {
             padding: 4,
           }}
         >
-          {/* Illustration */}
           <Box sx={{ mb: 4 }}>
             <Image
               src="/home.svg"
