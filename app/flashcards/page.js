@@ -81,7 +81,7 @@ export default function Flashcard() {
               onChange={handleCategoryChange}
               sx={{
                 marginBottom: 3,
-                backgroundColor: '#fff',
+                backgroundColor: '#F0F0F0',
                 borderRadius: '4px',
                 '& .MuiSelect-outlined': {
                   padding: '12px',
@@ -115,7 +115,7 @@ export default function Flashcard() {
               onChange={(e) => setPrompt(e.target.value)}
               sx={{
                 marginBottom: 2,
-                backgroundColor: '#fff',
+                backgroundColor: '#F0F0F0',
                 borderRadius: '4px',
                 '& .MuiOutlinedInput-root': {
                   '&.Mui-focused fieldset': {
