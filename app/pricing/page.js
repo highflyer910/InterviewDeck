@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import { Container, Typography, Grid, Button, Paper } from '@mui/material';
-import { handleCheckout } from '@/utils/get_stripe';
+import getStripe from '@/utils/get-stripe';
 
 
 const Pricing = () => {
@@ -47,7 +47,7 @@ const Pricing = () => {
                             variant="contained"
                             color="primary"
                             fullWidth
-                            onClick={() => handleCheckout('price_1XXXXXX')}
+                            onClick={ handleCheckout}
                         >
                             Get Started
                         </Button>
@@ -58,5 +58,22 @@ const Pricing = () => {
     );
 };
 
+
+const handleCheckout = async () => {
+    
+    const response = await fetch('/api/checkout_session', {
+        method: 'POST',
+        headers: {
+            'origin': 'http://localhost:3000'
+        },
+    });
+    const { id } = await response.json();
+    const stripe = await getStripe();
+    console.log(stripe);
+    const { error } = await stripe.redirectToCheckout({ sessionId: id });
+    if (error) {
+        console.error(error);
+    }
+}
 
 export default Pricing;
