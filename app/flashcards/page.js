@@ -1,45 +1,51 @@
-'use client'
+'use client';
 import { useUser } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
-import { collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import db from '@/firebase';
-import { Container, Typography, Box, TextField, MenuItem, Button } from '@mui/material';
-import { useRouter } from 'next/navigation';
-import Navbar from '../components/navbar';  
+import { useState } from 'react';
+import { Container, Typography, Box, TextField, MenuItem, Grid } from '@mui/material';
+import Navbar from '../components/navbar';
 
 export default function Flashcard() {
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
   const [prompt, setPrompt] = useState('');
   const [category, setCategory] = useState('');
   const [flashcards, setFlashcards] = useState([]);
-  const router = useRouter();
 
-  useEffect(() => {
-    async function fetchFlashcards() {
-      if (!user) return;
-      const userDocRef = doc(collection(db, 'users'), user.id);
-      const userDocSnap = await getDoc(userDocRef);
-      if (userDocSnap.exists()) {
-        setFlashcards(userDocSnap.data().flashcards || []);
-      } else {
-        await setDoc(userDocRef, { flashcards: [] });
+  const handleGenerate = async (selectedCategory) => {
+    try {
+      const response = await fetch('/api/generateFlashcards', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          prompt: `Generate 16 detailed flashcards about ${selectedCategory}. Each flashcard should include:
+        - A clear and concise question
+        - A comprehensive answer that provides an in-depth explanation or multiple sentences if necessary. 
+
+        Format each flashcard as follows:
+        Question: [The question goes here]
+        Answer: [The detailed answer goes here]
+
+        Repeat this format for all 16 flashcards. Ensure that the answers are informative and provide enough context for the question.`,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate flashcards');
       }
+
+      const data = await response.json();
+      setFlashcards(data.flashcards || []);
+
+    } catch (error) {
+      console.error("Error generating flashcards:", error);
     }
-    fetchFlashcards();
-  }, [user]);
+  };
 
-  const handleGenerate = async () => {
-    if (!user) return;
-    const newFlashcard = { prompt, category };
-    const userDocRef = doc(collection(db, 'users'), user.id);
-
-    // Update flashcards in Firestore
-    await updateDoc(userDocRef, {
-      flashcards: [...flashcards, newFlashcard],
-    });
-
-    setPrompt('');
-    setCategory('');
+  const handleCategoryChange = (e) => {
+    const selectedCategory = e.target.value;
+    setCategory(selectedCategory);
+    handleGenerate(selectedCategory);
   };
 
   if (!isLoaded || !isSignedIn) {
@@ -67,30 +73,12 @@ export default function Flashcard() {
 
           <Box sx={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
             <TextField
-              fullWidth
-              label="Enter your prompt"
-              variant="outlined"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              sx={{
-                marginBottom: 2,
-                backgroundColor: '#fff',
-                borderRadius: '4px',
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#de3f74', 
-                  },
-                },
-              }}
-            />
-
-            <TextField
               select
               fullWidth
               label="Select a category"
               variant="outlined"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={handleCategoryChange}
               sx={{
                 marginBottom: 3,
                 backgroundColor: '#fff',
@@ -119,21 +107,103 @@ export default function Flashcard() {
               <MenuItem value="databases">Databases</MenuItem>
             </TextField>
 
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleGenerate}
+            <TextField
+              fullWidth
+              label="Add additional prompts (optional)"
+              variant="outlined"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
               sx={{
-                backgroundColor: '#de3f74',
-                color: '#dde5db',
-                '&:hover': {
-                  backgroundColor: '#c33966',
+                marginBottom: 2,
+                backgroundColor: '#fff',
+                borderRadius: '4px',
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#de3f74', 
+                  },
                 },
               }}
-            >
-              Generate Flashcards
-            </Button>
+            />
           </Box>
+
+          {flashcards.length > 0 && (
+            <Box sx={{ marginTop: 4 }}>
+              <Typography variant="h5" gutterBottom>Generated Flashcards:</Typography>
+              <Grid container spacing={2}>
+                {flashcards.map((card, index) => (
+                  <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Box
+                      sx={{
+                        perspective: '1000px',
+                        height: '300px', 
+                        cursor: 'pointer',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          position: 'relative',
+                          width: '100%',
+                          height: '100%',
+                          transition: 'transform 0.6s',
+                          transformStyle: 'preserve-3d',
+                          '&:hover': {
+                            transform: 'rotateY(180deg)',
+                          },
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            width: '100%',
+                            height: '100%',
+                            backfaceVisibility: 'hidden',
+                            backgroundColor: '#f0f0f0',
+                            borderRadius: '12px',
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '16px',
+                            overflow: 'hidden',
+                            boxSizing: 'border-box',
+                            textAlign: 'center',
+                            border: '2px solid #de3f74',
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{card.question}</Typography>
+                        </Box>
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            width: '100%',
+                            height: '100%',
+                            backfaceVisibility: 'hidden',
+                            backgroundColor: '#f0f0f0',
+                            borderRadius: '12px',
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '16px',
+                            transform: 'rotateY(180deg)',
+                            overflowY: 'auto',
+                            maxHeight: '300px', 
+                            boxSizing: 'border-box',
+                            paddingTop: '20px', 
+                            textAlign: 'center',
+                            border: '2px solid #de3f74',
+                          }}
+                        >
+                          <Typography variant="body1">{card.answer}</Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          )}
         </Container>
       </Box>
     </>
