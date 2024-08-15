@@ -97,9 +97,7 @@ export default function Flashcard() {
               }}
             >
               <MenuItem value="computer-science">Computer Science</MenuItem>
-              <MenuItem value="algorithms">Algorithms</MenuItem>
               <MenuItem value="system-design">System Design</MenuItem>
-              <MenuItem value="data-structures">Data Structures</MenuItem>
               <MenuItem value="frontend">Frontend Development</MenuItem>
               <MenuItem value="backend">Backend Development</MenuItem>
               <MenuItem value="devops">DevOps</MenuItem>
