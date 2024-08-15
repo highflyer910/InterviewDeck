@@ -20,7 +20,7 @@ export default function Flashcard() {
         body: JSON.stringify({ 
           prompt: `Generate 16 detailed flashcards about ${selectedCategory}. Each flashcard should include:
         - A clear and concise question
-        - A comprehensive answer that provides an in-depth explanation or multiple sentences if necessary. 
+        - A comprehensive answer that provides an in-depth explanation or multiple sentences if necessary for a student. 
 
         Format each flashcard as follows:
         Question: [The question goes here]
