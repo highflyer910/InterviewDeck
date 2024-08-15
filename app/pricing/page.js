@@ -63,9 +63,7 @@ const handleCheckout = async () => {
     
     const response = await fetch('/api/checkout_session', {
         method: 'POST',
-        headers: {
-            'origin': 'http://localhost:3000'
-        },
+        
     });
     const { id } = await response.json();
     const stripe = await getStripe();
