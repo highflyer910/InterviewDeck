@@ -20,7 +20,7 @@ export default function Flashcard() {
         body: JSON.stringify({ 
           prompt: `Generate 16 detailed flashcards about ${selectedCategory}. Each flashcard should include:
         - A clear and concise question
-        - A comprehensive answer that provides an in-depth explanation or multiple sentences if necessary for a student. 
+        - A comprehensive answer that provides an in-depth explanation or multiple sentences if necessary. 
 
         Format each flashcard as follows:
         Question: [The question goes here]
@@ -137,7 +137,7 @@ export default function Flashcard() {
                         perspective: '1000px',
                         height: '300px', 
                         cursor: 'pointer',
-                        overflow: 'hidden',
+                        overflow: 'visible',
                       }}
                     >
                       <Box
@@ -150,6 +150,8 @@ export default function Flashcard() {
                           '&:hover': {
                             transform: 'rotateY(180deg)',
                           },
+                          transformOrigin: 'center',
+                          perspective: '1000px',
                         }}
                       >
                         <Box
@@ -183,7 +185,7 @@ export default function Flashcard() {
                             borderRadius: '12px',
                             boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
                             display: 'flex',
-                            alignItems: 'center',
+                            alignItems: 'flex-start',
                             justifyContent: 'center',
                             padding: '16px',
                             transform: 'rotateY(180deg)',
@@ -191,7 +193,7 @@ export default function Flashcard() {
                             maxHeight: '300px', 
                             boxSizing: 'border-box',
                             paddingTop: '20px', 
-                            textAlign: 'center',
+                            textAlign: 'left',
                             border: '2px solid #de3f74',
                           }}
                         >
